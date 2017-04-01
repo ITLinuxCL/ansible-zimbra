@@ -1,0 +1,4 @@
+./**/.vagrant
+./**/*.jar
+./**/*.class
+./vagrant/provision/*.retry

@@ -1,0 +1,85 @@
+---
+config_zbox_zimbra:
+  version: 8.7.6_GA
+  rpm_version: 8.7.6_GA_1776.RHEL7_64
+  rpm_release: 20170326144124
+  repo_url: https://files.zimbra.com/downloads
+  default_domain: zboxapp.dev
+  admin_password: 12345678
+  admin_username: admin
+  full_install: true
+  local_repo_path: /opt/src
+  fetch_timeout_secs: 60
+
+zbox_zimbra:
+  # Install variables
+  repo_url: "{{ config_zbox_zimbra.repo_url }}"
+  local_repo_path: "{{ config_zbox_zimbra.local_repo_path }}"
+  fetch_timeout_seconds: "{{ config_zbox_zimbra.fetch_timeout_secs }}"
+  
+  default_domain: "{{ config_zbox_zimbra.default_domain }}"
+  default_password: "{{ config_zbox_zimbra.admin_password }}"
+
+  # Admin user  
+  admin_username: "{{ config_zbox_zimbra.admin_username }}@{{ config_zbox_zimbra.default_domain }}"
+  admin_password: "{{ config_zbox_zimbra.admin_password }}"
+
+  # The roles of this server
+  server_roles:
+    full: "{{ config_zbox_zimbra.full_install }}"
+    store: "{{ config_zbox_zimbra.full_install | default(false)}}"
+    mta: "{{ config_zbox_zimbra.full_install | default(false)}}"
+    ldap: "{{ config_zbox_zimbra.full_install | default(false)}}"
+    web: "{{ config_zbox_zimbra.full_install | default(false)}}"
+    dns_cache: false
+    proxy: false
+
+
+  #####################################
+  # Fixed vars
+  #####################################
+  version: "{{config_zbox_zimbra.rpm_version}}.{{config_zbox_zimbra.rpm_release}}"
+
+  # Download config
+  # List of URLs: https://github.com/jorgedlcruz/zimbra_bits
+  download_url: "{{config_zbox_zimbra.repo_url}}/{{config_zbox_zimbra.version}}/zcs-{{config_zbox_zimbra.rpm_version}}.{{config_zbox_zimbra.rpm_release}}.tgz"
+  check256sum_url: "{{config_zbox_zimbra.repo_url}}/{{config_zbox_zimbra.version}}/zcs-{{config_zbox_zimbra.rpm_version}}.{{config_zbox_zimbra.rpm_release}}.tgz.sha256"
+  installation_file: "{{config_zbox_zimbra.local_repo_path}}/zcs-{{config_zbox_zimbra.rpm_version}}.{{config_zbox_zimbra.rpm_release}}.tgz"
+  check256sum_file: "{{config_zbox_zimbra.local_repo_path}}/zcs-{{config_zbox_zimbra.rpm_version}}.{{config_zbox_zimbra.rpm_release}}.tgz.sha256"
+
+  temp_install_dir: "/tmp/zcs-{{config_zbox_zimbra.rpm_version}}.{{config_zbox_zimbra.rpm_release}}"
+
+  # List of rpm dependencies
+  dependencies:
+    global:
+      - nc
+      - sudo
+      - libidn
+      - gmp
+      - libaio
+      - libstdc++
+      - unzip
+      - perl
+      - perl-core
+      - sysstat
+      - sqlite
+      - epel-release
+      - screen
+      - wget
+      - curl
+      - links
+      - ntp
+      - ntpdate
+      - strace
+      - telnet
+      - dos2unix
+      - libselinux-python
+      - mailx
+      - deltarpm
+    store:
+      - libreoffice
+      - libreoffice-headless
+
+
+  disable_services:
+    - postfix

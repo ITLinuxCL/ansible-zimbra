@@ -1,0 +1,50 @@
+---
+# tasks file for zbox.zimbra
+
+# Os leve tasks
+- include: os.yml
+  tags: common
+
+# Install tasks for every role
+- include: install.yml
+  when: zbox_zimbra.version != ansible_local.zimbra.version
+  tags: install
+
+# - include: install_zimbra.yml
+#   when: zimbra_check_installation.stat.islnk is not defined
+
+# - name: Check if Zimbra is configured
+#   command: /opt/zimbra/bin/zmprov gd {{ zimbra_default_domain }}
+#   ignore_errors: yes
+#   register: zimbra_check_configuration
+
+# - include: configure_zimbra.yml
+#   when: zimbra_check_configuration.rc != 0
+
+# - include: provision_zimbra.yml
+
+# - name: Copiamos Zimlet All Domains
+#   copy: src=com_zimbra_openalldomains.zip dest=/tmp/com_zimbra_openalldomains.zip
+
+# - name: Instalamos el Zimlet All Domains
+#   sudo_user: zimbra
+#   command: /opt/zimbra/bin/zmzimletctl deploy /tmp/com_zimbra_openalldomains.zip
+
+# - name: Habilita el uso de JSP para los Zimlets
+#   sudo_user: zimbra
+#   command: /opt/zimbra/bin/zmprov ms {{ ansible_nodename }} zimbraZimletJspEnabled TRUE
+
+# - name: Disable Zimbra Services
+#   sudo_user: zimbra
+#   command: /opt/zimbra/bin/zmprov ms {{ ansible_nodename }} -zimbraServiceEnabled antivirus -zimbraServiceEnabled antispam -zimbraServiceEnabled opendkim -zimbraServiceEnabled logger -zimbraServiceEnabled memcached -zimbraServiceEnabled proxy -zimbraServiceEnabled snmp -zimbraServiceEnabled spell -zimbraServiceEnabled dnscache zimbraAmavisEnableDKIMVerification FALSE
+#   ignore_errors: yes
+
+# - name: Change Zimbra Ports
+#   sudo_user: zimbra
+#   command: /opt/zimbra/bin/zmprov ms {{ ansible_nodename }} zimbraMailPort 7080 zimbraMailSSLPort 7443 zimbraMailMode both
+#   ignore_errors: yes
+
+# - name: Restart Zimbra Services
+#   sudo_user: zimbra
+#   command: /opt/zimbra/bin/zmcontrol restart
+#   ignore_errors: yes

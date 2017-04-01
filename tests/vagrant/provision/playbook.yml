@@ -1,0 +1,34 @@
+---
+- hosts: all
+  sudo: yes
+  vars:
+    bind_listen_ipv4:
+      - 'any'
+    bind_allow_query:
+      - '192.168.0.0/16'
+      - '127.0.0.0/8'
+    bind_recursion: 'yes'
+    bind_zone_name: 'zboxapp.dev'
+    bind_zone_master_server_ip: '192.168.51.11'
+    bind_zone_name_servers:
+      - 'zimbra'
+    bind_zone_mail_servers:
+      - name: 'zimbra'
+        preference: 10
+    bind_zone_hosts:
+      - name: 'zimbra'
+        ip: '192.168.51.11'
+
+  tasks:
+    - name: "restart nmcli"
+      shell: nmcli connection reload
+
+    - name: "restart netork"
+      service: name=network state=restarted enabled=yes
+
+    - name: "set root password"
+      shell: echo "12345678" | passwd --stdin root
+
+  roles:
+    - role: common
+    - role: bertvv.bind

@@ -1,0 +1,69 @@
+---
+# Taks for provision the base operating system
+- name: ensure custom facts directory exists
+  file:
+    path: /etc/ansible/facts.d
+    recurse: yes
+    state: directory
+
+- name: install custom fact module for Zimbra
+  copy:
+    src: zimbra.fact
+    dest: /etc/ansible/facts.d/zimbra.fact
+    mode: 0755
+
+- name: Disable Firewalld
+  service: name=firewalld state=stopped enabled=no
+
+- name: Desactiva SELINUX
+  selinux: state=disabled
+
+- name: reload ansible_local
+  setup: filter=ansible_local
+
+- name: Always install the latest tzdata
+  yum: name="{{ item }}" state=present
+  with_items:
+    - tzdata
+    - tzdata-java
+
+- name: Install Zimbra Global Dependencies
+  yum: name="{{ item }}" state=present
+  with_items: "{{ zbox_zimbra.dependencies.global }}"
+
+- name: Install Zimbra Store Dependencies
+  yum: name="{{ item }}" state=present
+  when: zbox_zimbra.server_roles.store
+  with_items: "{{ zbox_zimbra.dependencies.store | default([]) }}"
+
+- name: Install Zimbra MTA Dependencies
+  yum: name="{{ item }}" state=present
+  when: zbox_zimbra.server_roles.mta
+  with_items: "{{ zbox_zimbra.dependencies.mta | default([]) }}"
+
+- name: Install Zimbra DNS Cache Dependencies
+  yum: name="{{ item }}" state=present
+  when: zbox_zimbra.server_roles.dns_cache
+  with_items: "{{ zbox_zimbra.dependencies.dns_cache | default([]) }}"
+
+- name: Install Zimbra Proxy Dependencies
+  yum: name="{{ item }}" state=present
+  when: zbox_zimbra.server_roles.proxy
+  with_items: "{{ zbox_zimbra.dependencies.proxy | default([]) }}"
+
+- name: Install Zimbra LDAP Dependencies
+  yum: name="{{ item }}" state=present
+  when: zbox_zimbra.server_roles.ldap
+  with_items: "{{ zbox_zimbra.dependencies.ldap | default([]) }}"
+
+- name: Install Zimbra Web Dependencies
+  yum: name="{{ item }}" state=present
+  when: zbox_zimbra.server_roles.web
+  with_items: "{{ zbox_zimbra.dependencies.web | default([]) }}"
+
+- name: Disable services
+  service: name="{{ item }}" state=stopped enabled=no
+  with_items: "{{ zbox_zimbra.disable_services }}"
+  
+- name: Create Local Repo Directory
+  file: path="{{ zbox_zimbra.local_repo_path }}" state=directory

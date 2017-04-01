@@ -1,0 +1,31 @@
+---
+# Installation tasks
+- name: Download Checksum file
+  get_url:
+    url: "{{ zbox_zimbra.check256sum_url }}"
+    dest: "{{ zbox_zimbra.check256sum_file }}"
+    timeout: "{{ zbox_zimbra.fetch_timeout_seconds }}"
+
+- name: Register sha256 digest
+  command: cut -d" " -f1 "{{ zbox_zimbra.check256sum_file }}"
+  register: check256sum
+
+- name: Download Zimbra installation file
+  get_url: 
+    url: "{{ zbox_zimbra.download_url }}"
+    dest: "{{ zbox_zimbra.installation_file }}"
+    checksum: "sha256:{{ check256sum.stdout }}"
+    timeout: "{{ zbox_zimbra.fetch_timeout_seconds }}"
+
+- name: Untar Zimbra installation file
+  unarchive: src={{ zbox_zimbra.installation_file }} dest=/tmp/ copy=no
+
+- name: Install Zimbra Software
+  shell: yes 'Y' | {{ zbox_zimbra.temp_install_dir }}/install.sh -s --platform-override -x
+  args:
+    chdir: "{{ zbox_zimbra.temp_install_dir }}"
+
+- name: Remove Zimbra installation dir
+  file: path={{ zbox_zimbra.temp_install_dir }} state=absent
+  
+

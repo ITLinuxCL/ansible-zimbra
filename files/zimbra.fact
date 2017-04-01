@@ -1,0 +1,9 @@
+#!/bin/bash
+
+ZIMBRA_VERSION=`rpm -q --queryformat '%{VERSION}' zimbra-core`
+
+cat <<EOF
+{
+    "version" : "$ZIMBRA_VERSION"
+}
+EOF
