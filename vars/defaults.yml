@@ -1,0 +1,8 @@
+_zm_defaults:
+  network: false
+  repo_url: https://files.zimbra.com/downloads
+  os_family:
+    RedHat: "RHEL"
+    CentOS: "RHEL"
+
+    

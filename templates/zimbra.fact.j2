@@ -2,13 +2,13 @@
 ZIMBRA_PROVISIONED=false
 
 if [ -f "/opt/zimbra/bin/zmprov" ]; then
-  /opt/zimbra/bin/zmprov -l gs `/opt/zimbra/bin/zmhostname` 2>/dev/null
+  /opt/zimbra/bin/zmprov -l gs `/opt/zimbra/bin/zmhostname` 1>/dev/null 2>&1
   if [ $? -eq 0 ]; then
     ZIMBRA_PROVISIONED=true
   fi
 fi
 
-ZIMBRA_VERSION=`rpm -q --queryformat '%{VERSION}' zimbra-core` 2>/dev/null
+ZIMBRA_VERSION=`rpm -q --queryformat '%{VERSION}' zimbra-core | cut -d"_" -f1` 2>/dev/null
 
 cat <<EOF
 {

@@ -7,10 +7,10 @@
     state: directory
 
 - name: install custom fact module for Zimbra
-  copy:
-    src: zimbra.fact
+  template:
+    src: zimbra.fact.j2
     dest: /etc/ansible/facts.d/zimbra.fact
-    mode: 0755
+    mode: 0755  
 
 - name: Disable Firewalld
   service: name=firewalld state=stopped enabled=no
@@ -29,7 +29,8 @@
 
 - name: Install Zimbra Global Dependencies
   yum: name="{{ item }}" state=present
-  with_items: "{{ zbox_zimbra.dependencies.global }}"
+  when: false
+  with_items: "{{ zbox_zimbra.dependencies.global | default([]) }}"
 
 - name: Install Zimbra Store Dependencies
   yum: name="{{ item }}" state=present

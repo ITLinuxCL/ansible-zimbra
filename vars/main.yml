@@ -1,9 +1,11 @@
 ---
+# # Install tasks for every role
+# - include: defaults.yml
+
+# - include: zimbra_urls.yml
+
 zimbra_config:
   version: 8.7.6_GA
-  rpm_version: 8.7.6_GA_1776.RHEL7_64
-  rpm_release: 20170326144124
-  repo_url: https://files.zimbra.com/downloads
   admin_password: 12345678
   admin_username: admin
   default_domain: zboxapp.dev
@@ -26,12 +28,16 @@ zimbra_config:
   local_repo_path: /opt/src
   time_zone: "America/Santiago"
   ldap_server_id: 2
-  webmail_mode: https
-
+  webmail_mode: https  
 
 zbox_zimbra:
   # Install variables
-  repo_url: "{{ zimbra_config.repo_url }}"
+  installer_type: "{{ (zimbra_config.zimbra_type) | ternary('network', 'oss') }}"
+  installer_os: "{{ _zm_defaults.os_family[ansible_distribution] }}{{ ansible_distribution_major_version }}_{{ ansible_architecture }}"
+  installer_version: "v{{ zimbra_config.version }}_GA}}"
+
+  installer_file_name: 
+
   local_repo_path: "{{ zimbra_config.local_repo_path }}"
   fetch_timeout_seconds: "{{ zimbra_config.fetch_timeout_secs }}"
   version: "{{ zimbra_config.version }}"
@@ -43,13 +49,8 @@ zbox_zimbra:
   admin_username: "{{ zimbra_config.admin_username }}@{{ zimbra_config.default_domain }}"
   admin_password: "{{ zimbra_config.admin_password }}"
 
-  # Download config
-  # List of URLs: https://github.com/jorgedlcruz/zimbra_bits
-  download_url: "{{zimbra_config.repo_url}}/{{zimbra_config.version}}/zcs-{{zimbra_config.rpm_version}}.{{zimbra_config.rpm_release}}.tgz"
-  check256sum_url: "{{zimbra_config.repo_url}}/{{zimbra_config.version}}/zcs-{{zimbra_config.rpm_version}}.{{zimbra_config.rpm_release}}.tgz.sha256"
   installation_file: "{{zimbra_config.local_repo_path}}/zcs-{{zimbra_config.rpm_version}}.{{zimbra_config.rpm_release}}.tgz"
   check256sum_file: "{{zimbra_config.local_repo_path}}/zcs-{{zimbra_config.rpm_version}}.{{zimbra_config.rpm_release}}.tgz.sha256"
-
   temp_install_dir: "/tmp/zcs-{{zimbra_config.rpm_version}}.{{zimbra_config.rpm_release}}"
 
   # The roles of this server
@@ -169,4 +170,3 @@ zbox_zimbra:
     ldap:
       - zimbra-core
       - zimbra-ldap
-

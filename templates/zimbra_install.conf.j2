@@ -17,3 +17,13 @@
 {% endfor %}
 {% endif %}
 {% endfor %}
+INSTALL_PACKAGES="{{ zbox_zimbra.server_roles.common.install_packages | join(' ') -}}
+{% for role in ['store', 'mta', 'ldap', 'web', 'dns_cache', 'proxy' ] -%}
+{% if zbox_zimbra.server_roles[role] is defined -%}
+{% if zbox_zimbra.server_roles[role].install -%}
+{% if zbox_zimbra.server_roles[role].install_packages is defined -%}
+ {{ " " }}{{ zbox_zimbra.server_roles[role].install_packages | join(' ') -}} 
+{% endif -%}
+{% endif -%}
+{% endif -%}
+{% endfor -%}"
