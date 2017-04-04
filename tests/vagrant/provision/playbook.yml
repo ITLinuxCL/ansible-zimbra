@@ -29,6 +29,12 @@
     - name: "set root password"
       shell: echo "12345678" | passwd --stdin root
 
+    - name: "Copy ssh key to root"
+      authorized_key:
+        user: root
+        key: "{{ lookup('file', lookup('env','HOME') + '/.ssh/id_dsa.pub') }}"
+        state: present
+
   roles:
     - role: common
     - role: bertvv.bind

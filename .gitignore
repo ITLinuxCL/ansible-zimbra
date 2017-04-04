@@ -1,5 +1,4 @@
-./**/.vagrant
-./tests/.vagrant
-./**/*.jar
-./**/*.class
-./vagrant/provision/*.retry
+tests/.vagrant
+**/*.jar
+**/*.class
+tests/vagrant/provision/*.retry
