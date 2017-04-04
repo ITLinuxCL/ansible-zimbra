@@ -1,0 +1,19 @@
+{% for key in zbox_zimbra.server_roles.common.config %}
+{{ key |  replace('_', '') | upper }}={{ zbox_zimbra.server_roles.common.config[key] }}
+{% endfor %}
+{% for role in ['store', 'mta', 'ldap', 'web', 'dns_cache', 'proxy' ] %}
+{% if zbox_zimbra.server_roles[role].install %}
+{% if zbox_zimbra.server_roles[role].config is defined %}
+{% for key in zbox_zimbra.server_roles[role].config %}
+{{ key }}={{ zbox_zimbra.server_roles[role].config[key] }}
+{% endfor %}
+{% endif %}
+{% for config in ['zmlocalconfig', 'ldap_attrs'] %}
+{% if zbox_zimbra.server_roles[role][config] is defined %}
+{% for key in zbox_zimbra.server_roles[role][config] %}
+{{ key }}={{ zbox_zimbra.server_roles[role][config][key] }}
+{% endfor %}
+{% endif %}
+{% endfor %}
+{% endif %}
+{% endfor %}

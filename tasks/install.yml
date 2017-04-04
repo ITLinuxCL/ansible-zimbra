@@ -20,12 +20,16 @@
 - name: Untar Zimbra installation file
   unarchive: src={{ zbox_zimbra.installation_file }} dest=/tmp/ copy=no
 
+- name: Copy Zimbra installation config
+  template:
+    src: zimbra_install.conf.j2
+    dest: /tmp/zimbra_install.conf
+
 - name: Install Zimbra Software
-  shell: yes 'Y' | {{ zbox_zimbra.temp_install_dir }}/install.sh -s --platform-override -x
+  shell: yes 'Y' | {{ zbox_zimbra.temp_install_dir }}/install.sh --platform-override -x /tmp/zimbra_install.conf
   args:
     chdir: "{{ zbox_zimbra.temp_install_dir }}"
 
 - name: Remove Zimbra installation dir
   file: path={{ zbox_zimbra.temp_install_dir }} state=absent
   
-

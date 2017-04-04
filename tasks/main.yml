@@ -10,6 +10,9 @@
   when: zbox_zimbra.version != ansible_local.zimbra.version
   tags: install
 
+# - include: setup.yml
+#   when: not ansible_local.zimbra.provisioned
+
 # - include: install_zimbra.yml
 #   when: zimbra_check_installation.stat.islnk is not defined
 

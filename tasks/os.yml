@@ -33,32 +33,32 @@
 
 - name: Install Zimbra Store Dependencies
   yum: name="{{ item }}" state=present
-  when: zbox_zimbra.server_roles.store
+  when: zbox_zimbra.server_roles.store.install
   with_items: "{{ zbox_zimbra.dependencies.store | default([]) }}"
 
 - name: Install Zimbra MTA Dependencies
   yum: name="{{ item }}" state=present
-  when: zbox_zimbra.server_roles.mta
+  when: zbox_zimbra.server_roles.mta.install
   with_items: "{{ zbox_zimbra.dependencies.mta | default([]) }}"
 
 - name: Install Zimbra DNS Cache Dependencies
   yum: name="{{ item }}" state=present
-  when: zbox_zimbra.server_roles.dns_cache
+  when: zbox_zimbra.server_roles.dns_cache.install
   with_items: "{{ zbox_zimbra.dependencies.dns_cache | default([]) }}"
 
 - name: Install Zimbra Proxy Dependencies
   yum: name="{{ item }}" state=present
-  when: zbox_zimbra.server_roles.proxy
+  when: zbox_zimbra.server_roles.proxy.install
   with_items: "{{ zbox_zimbra.dependencies.proxy | default([]) }}"
 
 - name: Install Zimbra LDAP Dependencies
   yum: name="{{ item }}" state=present
-  when: zbox_zimbra.server_roles.ldap
+  when: zbox_zimbra.server_roles.ldap.install
   with_items: "{{ zbox_zimbra.dependencies.ldap | default([]) }}"
 
 - name: Install Zimbra Web Dependencies
   yum: name="{{ item }}" state=present
-  when: zbox_zimbra.server_roles.web
+  when: zbox_zimbra.server_roles.web.install
   with_items: "{{ zbox_zimbra.dependencies.web | default([]) }}"
 
 - name: Disable services

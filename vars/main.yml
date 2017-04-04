@@ -1,53 +1,134 @@
 ---
-config_zbox_zimbra:
+zimbra_config:
   version: 8.7.6_GA
   rpm_version: 8.7.6_GA_1776.RHEL7_64
   rpm_release: 20170326144124
   repo_url: https://files.zimbra.com/downloads
-  default_domain: zboxapp.dev
   admin_password: 12345678
   admin_username: admin
-  full_install: true
-  local_repo_path: /opt/src
+  default_domain: zboxapp.dev
+  email_notifications: yes
   fetch_timeout_secs: 60
+  full_install: true
+  http_port: 80
+  http_proxy_port: 7080
+  https_port: 443
+  https_proxy_port: 7443
+  ldap_port: 389
+  imap_port: 143
+  imap_proxy_port: 7143
+  imap_ssl_port: 993
+  imap_ssl_proxy_port: 7993
+  pop_port: 110
+  pop_proxy_port: 7110
+  pop_ssl_port: 995
+  pop_ssl_proxy_port: 7995
+  local_repo_path: /opt/src
+  time_zone: "America/Santiago"
+  ldap_server_id: 2
+  webmail_mode: https
+
 
 zbox_zimbra:
   # Install variables
-  repo_url: "{{ config_zbox_zimbra.repo_url }}"
-  local_repo_path: "{{ config_zbox_zimbra.local_repo_path }}"
-  fetch_timeout_seconds: "{{ config_zbox_zimbra.fetch_timeout_secs }}"
+  repo_url: "{{ zimbra_config.repo_url }}"
+  local_repo_path: "{{ zimbra_config.local_repo_path }}"
+  fetch_timeout_seconds: "{{ zimbra_config.fetch_timeout_secs }}"
+  version: "{{ zimbra_config.version }}"
   
-  default_domain: "{{ config_zbox_zimbra.default_domain }}"
-  default_password: "{{ config_zbox_zimbra.admin_password }}"
+  default_domain: "{{ zimbra_config.default_domain }}"
+  default_password: "{{ zimbra_config.admin_password }}"
 
   # Admin user  
-  admin_username: "{{ config_zbox_zimbra.admin_username }}@{{ config_zbox_zimbra.default_domain }}"
-  admin_password: "{{ config_zbox_zimbra.admin_password }}"
-
-  # The roles of this server
-  server_roles:
-    full: "{{ config_zbox_zimbra.full_install }}"
-    store: "{{ config_zbox_zimbra.full_install | default(false)}}"
-    mta: "{{ config_zbox_zimbra.full_install | default(false)}}"
-    ldap: "{{ config_zbox_zimbra.full_install | default(false)}}"
-    web: "{{ config_zbox_zimbra.full_install | default(false)}}"
-    dns_cache: false
-    proxy: false
-
-
-  #####################################
-  # Fixed vars
-  #####################################
-  version: "{{config_zbox_zimbra.rpm_version}}.{{config_zbox_zimbra.rpm_release}}"
+  admin_username: "{{ zimbra_config.admin_username }}@{{ zimbra_config.default_domain }}"
+  admin_password: "{{ zimbra_config.admin_password }}"
 
   # Download config
   # List of URLs: https://github.com/jorgedlcruz/zimbra_bits
-  download_url: "{{config_zbox_zimbra.repo_url}}/{{config_zbox_zimbra.version}}/zcs-{{config_zbox_zimbra.rpm_version}}.{{config_zbox_zimbra.rpm_release}}.tgz"
-  check256sum_url: "{{config_zbox_zimbra.repo_url}}/{{config_zbox_zimbra.version}}/zcs-{{config_zbox_zimbra.rpm_version}}.{{config_zbox_zimbra.rpm_release}}.tgz.sha256"
-  installation_file: "{{config_zbox_zimbra.local_repo_path}}/zcs-{{config_zbox_zimbra.rpm_version}}.{{config_zbox_zimbra.rpm_release}}.tgz"
-  check256sum_file: "{{config_zbox_zimbra.local_repo_path}}/zcs-{{config_zbox_zimbra.rpm_version}}.{{config_zbox_zimbra.rpm_release}}.tgz.sha256"
+  download_url: "{{zimbra_config.repo_url}}/{{zimbra_config.version}}/zcs-{{zimbra_config.rpm_version}}.{{zimbra_config.rpm_release}}.tgz"
+  check256sum_url: "{{zimbra_config.repo_url}}/{{zimbra_config.version}}/zcs-{{zimbra_config.rpm_version}}.{{zimbra_config.rpm_release}}.tgz.sha256"
+  installation_file: "{{zimbra_config.local_repo_path}}/zcs-{{zimbra_config.rpm_version}}.{{zimbra_config.rpm_release}}.tgz"
+  check256sum_file: "{{zimbra_config.local_repo_path}}/zcs-{{zimbra_config.rpm_version}}.{{zimbra_config.rpm_release}}.tgz.sha256"
 
-  temp_install_dir: "/tmp/zcs-{{config_zbox_zimbra.rpm_version}}.{{config_zbox_zimbra.rpm_release}}"
+  temp_install_dir: "/tmp/zcs-{{zimbra_config.rpm_version}}.{{zimbra_config.rpm_release}}"
+
+  # The roles of this server
+  server_roles:
+    full: "{{ zimbra_config.full_install }}"
+    common:
+      install_packages:
+        - zimbra-core
+      config:
+        av_domain: "{{ zimbra_config.default_domain }}"
+        av_user: "{{ zimbra_config.admin_username }}@{{ zimbra_config.default_domain }}"
+        create_admin: "{{ zimbra_config.admin_username }}@{{ zimbra_config.default_domain }}"
+        create_domain: "{{ zimbra_config.default_domain }}"
+        expand_menu: "no"
+        hostname: "{{ ansible_fqdn }}"
+        java_home: "{{ zimbra_config.java_home | default('/opt/zimbra/common/lib/jvm/java')}}"
+        ldap_host: "{{ (zimbra_config.full_install) | ternary(ansible_fqdn, zimbra_config.ldap_host) }}"
+        ldap_port: "{{ zimbra_config.ldap_port }}"
+        ldap_bes_search_set: "set"
+        mode: "{{ zimbra_config.webmail_mode }}"
+        remove: "{{ (zimbra_config.uninstall) | default(false) |ternary('yes', 'no') }}"
+        run_vm_ha: "no"
+        smtp_dest: "{{ zimbra_config.admin_username }}@{{ zimbra_config.default_domain }}"
+        smtp_host: "{{ (zimbra_config.full_install) | ternary(ansible_fqdn, zimbra_config.smtp_host) }}"
+        smtp_notify: "{{ zimbra_config.email_notifications }}"
+        smtp_source: "{{ zimbra_config.admin_username }}@{{ zimbra_config.default_domain }}"
+        start_servers: "yes"
+        upgrade: "{{ (ansible_local.zimbra.provisioned) | ternary('yes', 'no') }}"
+        use_ephemeral_store: "no"
+    store: 
+      install: "{{ zimbra_config.full_install | default(false)}}"
+    mta: 
+      install: "{{ zimbra_config.full_install | default(false)}}"
+    ldap: 
+      install: "{{ zimbra_config.full_install | default(false)}}"
+      install_packages:
+        - zimbra-ldap
+      config:
+        doc_create_admin: "no"
+        doc_create_domain: "yes"
+        http_port: "{{ zimbra_config.http_port }}"
+        http_proxy_port: "{{ zimbra_config.http_proxy_port }}"
+        https_port: "{{ zimbra_config.https_port }}"
+        https_proxy_port: "{{ zimbra_config.https_proxy_port }}"
+        imap_port: "{{ zimbra_config.imap_port }}"
+        imap_proxy_port: "{{ zimbra_config.imap_proxy_port }}"
+        imap_ssl_port: "{{ zimbra_config.imap_ssl_port }}"
+        imap_ssl_proxy_port: "{{ zimbra_config.imap_ssl_proxy_port }}"
+        ldap_replication_type: "{{ zimbra_config.zimbra_replication_type | default('master')}}"
+        ldap_server_id: "{{ zimbra_config.ldap_server_id | default(100 | random(start=3) | string)}}"
+        pop_port: "{{ zimbra_config.pop_port }}" 
+        pop_proxy_port: "{{ zimbra_config.pop_proxy_port }}"
+        pop_ssl_port: "{{ zimbra_config.pop_ssl_port }}"
+        pop_ssl_proxy_port: "{{ zimbra_config.pop_ssl_proxy_port }}"
+        proxy_mode: "{{ zimbra_config.proxy_mode | default(zimbra_config.webmail_mode) }}"
+        spell_url: ""
+      zmlocalconfig:
+        ldap_bes_searcher_password: "ldap_bes"
+        ldap_dit_base_dn_config: "cn=zimbra"
+        ldap_nginx_password: "{{ zimbra_config.ldap_nginx_password | default(zimbra_config.admin_password) }}"
+        ldap_root_password: "{{ zimbra_config.ldap_root_password | default(zimbra_config.admin_password) }}"
+        mailboxd_directory: "/opt/zimbra/mailboxd"
+        mailboxd_keystore: "/opt/zimbra/conf/keystore"
+        mailboxd_keystore_password: "{{ zimbra_config.ldap_nginx_password | default(zimbra_config.admin_password) }}"
+        mailboxd_truststore: "/opt/zimbra/common/lib/jvm/java/jre/lib/security/cacerts"
+        mailboxd_truststore_password: "changeit"
+        ssl_default_digest: "sha256"
+        zimbra_ldap_userdn: "uid=zimbra,cn=admins,cn=zimbra"
+        zimbra_require_interprocess_security: "{{ zimbra_config.interprocess_security | default('0') }}"
+      ldap_attrs:
+        zimbraIPMode: "ipv4"
+        zimbraPrefTimeZoneId: "{{ zimbra_config.time_zone }}"
+    web: 
+      install: "{{ zimbra_config.full_install | default(false)}}"
+
+    dns_cache: 
+      install: false
+    proxy:
+      install: false
 
   # List of rpm dependencies
   dependencies:
@@ -83,3 +164,9 @@ zbox_zimbra:
 
   disable_services:
     - postfix
+
+  packages:
+    ldap:
+      - zimbra-core
+      - zimbra-ldap
+

@@ -1,0 +1,10 @@
+---
+# tasks file
+
+- name: Copy Zimbra installation config
+  template:
+    src: zimbra_install.conf.j2
+    dest: /tmp/zimbra_install.conf
+
+- name: Run Zimbra zmsetup
+  command: /opt/zimbra/libexec/zmsetup.pl /tmp/zimbra_install.conf
