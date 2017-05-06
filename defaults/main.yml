@@ -1,2 +1,20 @@
 ---
 # defaults file for zbox.zimbra
+
+# Type of Zimbra to setup
+# OSS => Open Source Free
+# NETWORK => Pay version
+zimbra_type: "OSS"
+
+# Version of Zimbra
+# All versions in zimbra_urls.yml
+zimbra_version: "8.7.6_GA"
+
+# From where download the Zimbra installer files
+zimbra_repo_url: "https://files.zimbra.com/downloads"
+  
+  os_family:
+    RedHat: "RHEL"
+    CentOS: "RHEL"
+
+    
